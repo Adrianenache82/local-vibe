@@ -1,11 +1,16 @@
 /**
  * API Configuration
- * Contains API keys and configuration for external services
+ * Contains configuration for external services
  */
 
+const getApiProxyBaseUrl = (): string => {
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://local-vibe-api.fly.dev/api/places'; // Production URL (to be updated)
+  }
+  return 'http://localhost:3000/api/places'; // Development URL
+};
+
 const getApiKey = (): string => {
-  const testApiKey = 'AIzaSyBmsEstzYr3v7B4xRzSZ-UIW_VYfMHVBgY';
-  
   if (typeof process !== 'undefined' && process.env && process.env.GOOGLE_PLACES_API_KEY) {
     return process.env.GOOGLE_PLACES_API_KEY;
   }
@@ -15,7 +20,7 @@ const getApiKey = (): string => {
     if (storedKey) return storedKey;
   }
   
-  return testApiKey; // Use test API key as fallback
+  return ''; // Empty string as fallback - the server will use its own key
 };
 
 export const API_CONFIG = {
@@ -25,5 +30,6 @@ export const API_CONFIG = {
     lng: -111.8413
   },
   GOOGLE_PLACES_RADIUS: 20000, // 20km radius to include surrounding areas
-  GOOGLE_PLACES_LANGUAGE: 'en'
+  GOOGLE_PLACES_LANGUAGE: 'en',
+  API_PROXY_BASE_URL: getApiProxyBaseUrl()
 };

@@ -10,6 +10,7 @@ import { SocialClub } from '../models/social-club';
 import { SportsClub } from '../models/sports-club';
 import { Club } from '../models/club';
 import { v4 as uuidv4 } from 'uuid';
+import { API_CONFIG } from '../config/api-config';
 
 interface PlacesApiResponse {
   results: PlaceResult[];
@@ -387,11 +388,10 @@ export class GooglePlacesService {
   }
 
   /**
-   * Fetch places from Google Places API
+   * Fetch places from Google Places API via proxy
    */
   private async fetchPlaces(type: string, pageToken?: string): Promise<PlacesApiResponse> {
     const params = new URLSearchParams({
-      key: this.config.apiKey,
       location: `${this.config.location.lat},${this.config.location.lng}`,
       radius: this.config.radius.toString(),
       type,
@@ -403,7 +403,7 @@ export class GooglePlacesService {
     }
 
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?${params.toString()}`
+      `${API_CONFIG.API_PROXY_BASE_URL}/nearby?${params.toString()}`
     );
 
     if (!response.ok) {
@@ -414,18 +414,17 @@ export class GooglePlacesService {
   }
 
   /**
-   * Fetch place details from Google Places API
+   * Fetch place details from Google Places API via proxy
    */
   private async fetchPlaceDetails(placeId: string): Promise<PlaceDetailsResponse> {
     const params = new URLSearchParams({
-      key: this.config.apiKey,
       place_id: placeId,
       language: this.config.language,
       fields: 'name,formatted_address,geometry,rating,photos,types,business_status,opening_hours,price_level,reviews,website,formatted_phone_number,url,editorial_summary'
     });
 
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?${params.toString()}`
+      `${API_CONFIG.API_PROXY_BASE_URL}/details/${placeId}?${params.toString()}`
     );
 
     if (!response.ok) {
@@ -436,11 +435,10 @@ export class GooglePlacesService {
   }
 
   /**
-   * Fetch places using text search from Google Places API
+   * Fetch places using text search from Google Places API via proxy
    */
   private async fetchTextSearch(query: string): Promise<PlacesApiResponse> {
     const params = new URLSearchParams({
-      key: this.config.apiKey,
       query,
       location: `${this.config.location.lat},${this.config.location.lng}`,
       radius: this.config.radius.toString(),
@@ -448,7 +446,7 @@ export class GooglePlacesService {
     });
 
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?${params.toString()}`
+      `${API_CONFIG.API_PROXY_BASE_URL}/textsearch?${params.toString()}`
     );
 
     if (!response.ok) {
@@ -538,10 +536,10 @@ export class GooglePlacesService {
   }
 
   /**
-   * Get photo URL from Google Places API
+   * Get photo URL from Google Places API via proxy
    */
   private getPhotoUrl(photoReference: string): string {
-    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${this.config.apiKey}`;
+    return `${API_CONFIG.API_PROXY_BASE_URL}/photo/${photoReference}?maxwidth=400`;
   }
 
   /**
